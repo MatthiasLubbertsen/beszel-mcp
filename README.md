@@ -50,6 +50,24 @@ The server requires the following environment variables:
 - `BESZEL_URL`: The URL of your Beszel/PocketBase instance (e.g., `http://localhost:8090`)
 - `BESZEL_EMAIL` (optional): Admin email for authentication
 - `BESZEL_PASSWORD` (optional): Admin password for authentication
+- `BESZEL_SUPERUSER` (optional, default `false`): set to `true` to log in against PocketBase's `_superusers` collection instead of `users`. Required if the account is a superuser (Beszel 0.21+).
+- `MCP_TRANSPORT` (optional): `stdio` (default) or `http` (Streamable HTTP)
+- `MCP_PORT` (optional, default `8000`) and `MCP_HOST` (default `0.0.0.0`): HTTP listen address
+- `MCP_AUTH_TOKEN` (optional): if set, every HTTP request except `/health` must send `Authorization: Bearer <token>`
+
+## HTTP transport & Docker
+
+With `MCP_TRANSPORT=http` the server exposes Streamable HTTP at `/mcp` and an unauthenticated `GET /health`.
+
+```bash
+docker run -p 8000:8000 \
+  -e BESZEL_URL=http://beszel:8090 -e BESZEL_EMAIL=you@example.com \
+  -e BESZEL_PASSWORD=secret -e BESZEL_SUPERUSER=true \
+  -e MCP_AUTH_TOKEN=change-me \
+  ghcr.io/matthiaslubbertsen/beszel-mcp:latest
+```
+
+The image defaults to `MCP_TRANSPORT=http`. See [docker-compose.example.yml](docker-compose.example.yml). Multi-arch (amd64/arm64) images are published to `ghcr.io/matthiaslubbertsen/beszel-mcp` by GitHub Actions on pushes to `master` and `v*` tags. Put the HTTP endpoint behind TLS if it is exposed beyond a trusted network.
 
 ## Usage
 

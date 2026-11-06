@@ -82,3 +82,15 @@ async def test_build_time_filter(client):
     # Test with no time range
     filter_str = client.build_time_filter("created", None, None)
     assert filter_str == ""
+
+
+@pytest.mark.asyncio
+async def test_authenticate_superuser_collection():
+    """Superuser login must hit the _superusers collection."""
+    c = PocketBaseClient("http://localhost:8090", "a@b.c", "pw", superuser=True)
+    with patch.object(c.client, "post") as mock_post:
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"token": "t"}
+        mock_post.return_value = mock_response
+        await c.authenticate()
+        assert "/api/collections/_superusers/auth-with-password" in mock_post.call_args.args[0]

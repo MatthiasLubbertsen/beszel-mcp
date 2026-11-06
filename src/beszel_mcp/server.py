@@ -3,11 +3,19 @@
 import os
 from typing import Optional
 from fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from .pocketbase_client import PocketBaseClient
 
 # Initialize FastMCP server
 mcp = FastMCP("beszel-mcp")
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request: Request) -> JSONResponse:
+    """Unauthenticated liveness probe (HTTP transport only)."""
+    return JSONResponse({"status": "ok"})
 
 # Global client instance
 pb_client: Optional[PocketBaseClient] = None
@@ -25,7 +33,11 @@ def get_client() -> PocketBaseClient:
         email = os.environ.get("BESZEL_EMAIL")
         password = os.environ.get("BESZEL_PASSWORD")
         
-        pb_client = PocketBaseClient(base_url, email, password)
+        superuser = os.environ.get("BESZEL_SUPERUSER", "").strip().lower() in (
+            "1", "true", "yes", "on",
+        )
+
+        pb_client = PocketBaseClient(base_url, email, password, superuser)
     
     return pb_client
 

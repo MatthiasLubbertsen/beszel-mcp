@@ -8,17 +8,27 @@ from datetime import datetime
 class PocketBaseClient:
     """Client for interacting with PocketBase API."""
 
-    def __init__(self, base_url: str, email: Optional[str] = None, password: Optional[str] = None):
+    def __init__(
+        self,
+        base_url: str,
+        email: Optional[str] = None,
+        password: Optional[str] = None,
+        superuser: bool = False,
+    ):
         """Initialize the PocketBase client.
         
         Args:
             base_url: The base URL of the PocketBase instance
             email: Optional admin email for authentication
             password: Optional admin password for authentication
+            superuser: Authenticate against the PocketBase ``_superusers``
+                collection instead of ``users`` (needed for Beszel 0.21+
+                superuser accounts)
         """
         self.base_url = base_url.rstrip("/")
         self.email = email
         self.password = password
+        self.superuser = superuser
         self.token: Optional[str] = None
         self.client = httpx.AsyncClient(timeout=30.0)
 
@@ -28,8 +38,9 @@ class PocketBaseClient:
             return
 
         try:
+            collection = "_superusers" if self.superuser else "users"
             response = await self.client.post(
-                f"{self.base_url}/api/collections/users/auth-with-password",
+                f"{self.base_url}/api/collections/{collection}/auth-with-password",
                 json={
                     "identity": self.email,
                     "password": self.password,
