@@ -67,7 +67,7 @@ docker run -p 8000:8000 \
   ghcr.io/matthiaslubbertsen/beszel-mcp:latest
 ```
 
-The image defaults to `MCP_TRANSPORT=http`. See [docker-compose.example.yml](docker-compose.example.yml). Multi-arch (amd64/arm64) images are published to `ghcr.io/matthiaslubbertsen/beszel-mcp` by GitHub Actions on pushes to `main` and `v*` tags. Put the HTTP endpoint behind TLS if it is exposed beyond a trusted network.
+The image defaults to `MCP_TRANSPORT=http`. See [docker-compose.example.yml](docker-compose.example.yml). Multi-arch (amd64/arm64) images are published to `ghcr.io/matthiaslubbertsen/beszel-mcp` by GitHub Actions on pushes to `master` and `v*` tags. Put the HTTP endpoint behind TLS if it is exposed beyond a trusted network.
 
 ## Usage
 
