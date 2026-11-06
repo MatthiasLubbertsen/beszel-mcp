@@ -1,0 +1,12 @@
+services:
+  beszel-mcp:
+    image: ghcr.io/matthiaslubbertsen/beszel-mcp:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      BESZEL_URL: http://beszel:8090
+      BESZEL_EMAIL: ${BESZEL_EMAIL}
+      BESZEL_PASSWORD: ${BESZEL_PASSWORD}
+      BESZEL_SUPERUSER: "true"          # Beszel 0.21 superuser accounts
+      MCP_AUTH_TOKEN: ${MCP_AUTH_TOKEN} # clients send: Authorization: Bearer <token>
