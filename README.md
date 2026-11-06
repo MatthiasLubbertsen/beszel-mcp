@@ -50,10 +50,28 @@ The server requires the following environment variables:
 - `BESZEL_URL`: The URL of your Beszel/PocketBase instance (e.g., `http://localhost:8090`)
 - `BESZEL_EMAIL` (optional): Admin email for authentication
 - `BESZEL_PASSWORD` (optional): Admin password for authentication
+- `BESZEL_TOKEN` (optional): a pre-issued PocketBase auth token. If set, it is used as-is and email/password login is skipped (useful with OIDC-only setups). See [Using a token](#using-a-token-instead-of-a-password).
 - `BESZEL_SUPERUSER` (optional, default `false`): set to `true` to log in against PocketBase's `_superusers` collection instead of `users`. Required if the account is a superuser (Beszel 0.21+).
 - `MCP_TRANSPORT` (optional): `stdio` (default) or `http` (Streamable HTTP)
 - `MCP_PORT` (optional, default `8000`) and `MCP_HOST` (default `0.0.0.0`): HTTP listen address
 - `MCP_AUTH_TOKEN` (optional): if set, every HTTP request except `/health` must send `Authorization: Bearer <token>`
+
+### Using a token instead of a password
+
+PocketBase has no static API keys, but a superuser can mint a non-refreshable token for any auth record with a custom lifetime via the impersonate endpoint. Do this once from your own machine (the superuser credentials are not stored on the server):
+
+```bash
+SU=$(curl -s $BESZEL_URL/api/collections/_superusers/auth-with-password \
+  -H 'Content-Type: application/json' \
+  -d '{"identity":"admin@example.com","password":"..."}' | jq -r .token)
+
+# <USER_ID> is the id of your Beszel user (in the PocketBase admin, `users` collection)
+curl -s -X POST $BESZEL_URL/api/collections/users/impersonate/<USER_ID> \
+  -H "Authorization: Bearer $SU" -H 'Content-Type: application/json' \
+  -d '{"duration": 31536000}' | jq -r .token
+```
+
+Set the result as `BESZEL_TOKEN` (leave `BESZEL_EMAIL`/`BESZEL_PASSWORD` unset). The token acts as that user and cannot be refreshed: when it expires, requests fail with 401 and you must mint a new one. Impersonate a regular user to get read access to that user's systems only; impersonating a `_superusers` record gives full access.
 
 ## HTTP transport & Docker
 

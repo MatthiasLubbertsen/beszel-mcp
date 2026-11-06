@@ -6,7 +6,5 @@ services:
       - "8000:8000"
     environment:
       BESZEL_URL: http://beszel:8090
-      BESZEL_EMAIL: ${BESZEL_EMAIL}
-      BESZEL_PASSWORD: ${BESZEL_PASSWORD}
-      BESZEL_SUPERUSER: "true"          # Beszel 0.21 superuser accounts
+      BESZEL_TOKEN: ${BESZEL_TOKEN}      # PocketBase token (see README); or use BESZEL_EMAIL + BESZEL_PASSWORD
       MCP_AUTH_TOKEN: ${MCP_AUTH_TOKEN} # clients send: Authorization: Bearer <token>

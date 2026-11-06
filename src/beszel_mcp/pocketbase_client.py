@@ -14,6 +14,7 @@ class PocketBaseClient:
         email: Optional[str] = None,
         password: Optional[str] = None,
         superuser: bool = False,
+        token: Optional[str] = None,
     ):
         """Initialize the PocketBase client.
         
@@ -24,12 +25,14 @@ class PocketBaseClient:
             superuser: Authenticate against the PocketBase ``_superusers``
                 collection instead of ``users`` (needed for Beszel 0.21+
                 superuser accounts)
+            token: Optional pre-issued PocketBase auth token. When set, it is
+                sent as-is and no login is performed.
         """
         self.base_url = base_url.rstrip("/")
         self.email = email
         self.password = password
         self.superuser = superuser
-        self.token: Optional[str] = None
+        self.token: Optional[str] = token or None
         self.client = httpx.AsyncClient(timeout=30.0)
 
     async def authenticate(self) -> None:

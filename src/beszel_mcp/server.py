@@ -37,7 +37,9 @@ def get_client() -> PocketBaseClient:
             "1", "true", "yes", "on",
         )
 
-        pb_client = PocketBaseClient(base_url, email, password, superuser)
+        pb_client = PocketBaseClient(
+            base_url, email, password, superuser, os.environ.get("BESZEL_TOKEN") or None
+        )
     
     return pb_client
 
