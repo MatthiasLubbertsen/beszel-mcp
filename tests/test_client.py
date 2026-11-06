@@ -94,3 +94,10 @@ async def test_authenticate_superuser_collection():
         mock_post.return_value = mock_response
         await c.authenticate()
         assert "/api/collections/_superusers/auth-with-password" in mock_post.call_args.args[0]
+
+
+def test_token_is_used_without_login():
+    """A pre-issued token is sent as the bearer header."""
+    c = PocketBaseClient("http://localhost:8090", token="abc")
+    assert c.token == "abc"
+    assert c._get_headers()["Authorization"] == "Bearer abc"
